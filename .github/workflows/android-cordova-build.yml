@@ -1,0 +1,71 @@
+name: Build Cordova APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: ${{ runner.workspace }}/android-sdk
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install system deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget unzip tar lib32stdc++6 lib32z1
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16'
+
+    - name: Install Cordova globally
+      run: npm install -g cordova@11
+
+    - name: Install Android SDK cmdline-tools
+      run: |
+        mkdir -p $ANDROID_HOME/cmdline-tools
+        cd $ANDROID_HOME/cmdline-tools
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline.zip
+        unzip -o cmdline.zip -d latest
+        rm cmdline.zip
+        export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
+    - name: Create Cordova project and copy www
+      run: |
+        cd $GITHUB_WORKSPACE
+        cordova create myapp com.hacked.tiktokclone TikLite || true
+        rm -rf myapp/www/*
+        cp -r $GITHUB_WORKSPACE/* myapp/www/ || true
+        rm -rf myapp/www/.github || true
+        ls -la myapp/www
+
+    - name: Add android platform
+      run: |
+        cd $GITHUB_WORKSPACE/myapp
+        cordova platform add android
+
+    - name: Build APK (debug)
+      run: |
+        cd $GITHUB_WORKSPACE/myapp
+        cordova build android --debug
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: tiklite-apk
+        path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
