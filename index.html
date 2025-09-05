@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TikLite — Demo Clone</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="player">
+      <!-- default remote sample video (fallback) -->
+      <video id="video" playsinline controls>
+        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+      </video>
+
+      <div class="left-info">
+        <div class="profile">
+          <!-- default DP (remote placeholder) -->
+          <img id="dp" src="https://via.placeholder.com/150" alt="DP">
+          <div class="meta">
+            <div id="username">@DemoUser</div>
+            <div id="followers">Followers: <span id="fcount">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-icons">
+        <div class="icon heart" id="heart">♡<div class="count" id="likes">0</div></div>
+        <div class="icon comment" id="comment">💬</div>
+        <div class="icon share" id="share">🔗</div>
+      </div>
+
+      <label class="plus-btn" for="uploadInput">＋</label>
+      <input id="uploadInput" type="file" accept="video/*" hidden>
+    </div>
+
+    <div class="controls-row">
+      <input id="nameInput" placeholder="Change username" />
+      <input id="dpInput" type="file" accept="image/*" />
+      <button id="incViews">+Views +100</button>
+      <button id="incLikes">+Likes +10</button>
+      <button id="incFollowers">+Follow +1</button>
+    </div>
+
+    <div class="library">
+      <h3>Local Videos</h3>
+      <ul id="list"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
